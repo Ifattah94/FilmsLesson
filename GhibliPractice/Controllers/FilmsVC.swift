@@ -17,8 +17,11 @@ class FilmsVC: UITableViewController {
            }
        }
     
+    var darkModeIsOn = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.navigationBar.backgroundColor = .clear
         loadData()
 
     
@@ -39,6 +42,15 @@ class FilmsVC: UITableViewController {
         }
     }
 
+    
+    @IBAction func EditButtonPressed(_ sender: UIBarButtonItem) {
+        let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
+        let settingsVC = storyboard.instantiateViewController(identifier: "SettingsVC") as! SettingsVC
+        settingsVC.delegate = self
+        settingsVC.switchOnOrOff = self.darkModeIsOn
+        self.navigationController?.pushViewController(settingsVC, animated: true)
+    }
+    
     
 
     // MARK: - Table view data source
@@ -78,15 +90,33 @@ extension FilmsVC: FilmCellDelegate {
         let optionsMenu = UIAlertController.init(title: "Options", message: "Pick an option", preferredStyle: .actionSheet)
         let favoriteAction = UIAlertAction.init(title: "Favorite", style: .default) { (action) in
             //Favorite using persistence
+            let film = self.films[tag]
+            print("My favorite film is \(film.title)")
         }
         let deleteAction = UIAlertAction.init(title: "Delete", style: .destructive) { (action) in
             //Delete from persistence
+            let film = self.films[tag]
+            print("I just deleted \(film.title)")
         }
         let cancelAction = UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil)
         optionsMenu.addAction(favoriteAction)
         optionsMenu.addAction(deleteAction)
         optionsMenu.addAction(cancelAction)
         present(optionsMenu, animated: true, completion: nil)
+    }
+    
+    
+}
+
+extension FilmsVC: SettingsDelegate {
+    func darkModeOn() {
+        self.tableView.backgroundColor = .black
+        self.darkModeIsOn = true
+    }
+    
+    func darkModeOff() {
+        self.tableView.backgroundColor = .white
+        self.darkModeIsOn = false
     }
     
     
